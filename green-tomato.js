@@ -201,7 +201,8 @@ exports.serve = function(configParams) {
   }
 
   function initDB() {
-    Mongoose.connect('mongodb://localhost/green-tomato', {
+    const host = configParams.mongoHost || 'localhost';
+    Mongoose.connect('mongodb://'+ host + '/green-tomato', {
       server: {
         auto_reconnect: true,
         socketOptions : {
