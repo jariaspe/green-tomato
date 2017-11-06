@@ -109,8 +109,8 @@ exports.serve = function(configParams) {
       },
       parsedHeaders = __.sortObjectDeep(formatHeaders(request.headers));
 
-    if (configParams.regexp && configParams.substitution) {
-      request.url = request.url.replace(configParams.regex.search, configParams.regex.replace);
+    if (configParams.regexp.search && configParams.regexp.replace) {
+      request.url = request.url.replace(configParams.regexp.search, configParams.regexp.replace);
     }
 
     if (!_.isEmpty(parsedHeaders)) {
