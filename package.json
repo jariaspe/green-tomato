@@ -1,10 +1,10 @@
 {
   "name": "green-tomato",
-  "version": "0.2.1",
-  "description": "A reverse caching proxy that stores the server responses in mongoDB, to save developers ss\\'s whenever server fails",
+  "version": "0.4.7",
+  "description": "A sandbox and mock server that automatically records mocks by a reverse proxy. It can be used as a API cache",
   "main": "green-tomato.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./index.js"
   },
   "repository": {
     "type": "git",
@@ -12,10 +12,11 @@
   },
   "keywords": [
     "reverse",
-    "proxy",
+    "mock",
+    "sandbox",
+    "mock-server",
     "proxy",
     "cache",
-    "api",
     "api",
     "test",
     "javascript",
@@ -26,8 +27,8 @@
   ],
   "dependencies": {
     "hoxy": "*",
-    "lodash": "^4.15.0",
-    "mongoose": "^4.5.9",
+    "lodash": "^4.17.15",
+    "mongoose": "^5.9.6",
     "prettyjson": "aemonge/prettyjson",
     "q": "^2.0.3"
   },
