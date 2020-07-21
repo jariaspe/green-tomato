@@ -1,4 +1,3 @@
-"use strict";
 /* eslint no-console: 0 */
 
 var Q = require("q");
@@ -24,9 +23,9 @@ class GreenTomato {
   }
 
   respondEntry(response, entry) {
-    var responseData = entry.responseData;
+    var responseData = entry ? entry.responseData : {};
     const type = typeof responseData;
-    response.statusCode = entry.responseStatusCode || 200;
+    response.statusCode = entry ? entry.responseStatusCode || 200 : 200;
     response.string = JSON.stringify(responseData);
     response.headers["content-type"] = `${(type === "object" ? "application/json" : "text/html;")} ; charset=UTF-8`;
   }
@@ -144,19 +143,16 @@ class GreenTomato {
     if (this.config.logLevel === "verbose") {
       this.printSearchNeedle(searchNeedle);
     }
-
     this.ServicesSchema.find(searchNeedle.query)
       .findOne().exec()
       .then((entry) => {
         this.respondEntry(response, entry), resolve(200);
-      }).catch(() => {
+      }).catch((e) => {
         if (this.config.useOptional) {
           if (this.config.logLevel === "error") {
             this.printSearchNeedle(searchNeedle);
           }
           this.respondError(response), reject(new Error(418));
-        } else {
-          this.searchForRequest(resolve, reject, request, response, true);
         }
       });
   }
@@ -173,7 +169,6 @@ class GreenTomato {
     if (this.config.useRecords) {
       this.proxy.intercept({
         phase: "request",
-        as: "json",
         method: method
       }, this.requestInterceptor.bind(this));
     } else {
@@ -189,7 +184,6 @@ class GreenTomato {
           this.requestPrintLog(request, false);
         }
       });
-
       this.proxy.intercept({
         phase: "response",
         as: "json",
@@ -203,9 +197,10 @@ class GreenTomato {
 
     this.mongoDB = Mongoose.connection;
     this.mongoDB.once("open", () => {
+      console.log("Connection open with database");
       this.ServicesSchema = Mongoose.model(this.config.mongoSchema, this.servicesShemaModel);
     });
-    this.mongoDB.on("error", console.error.bind(console, "Error:"));
+    this.mongoDB.on("error", (err) => {console.error(err)});
   }
 
   parseOptionalIgnoredProps() {
@@ -221,9 +216,10 @@ class GreenTomato {
 
   start() {
     this.initDB();
-    this.proxy = Hoxy.createServer({
+    const options = this.config.useRecords ? {} : {
       reverse: this.config.proxyHost
-    }).listen(this.config.port);
+    };
+    this.proxy = Hoxy.createServer(options).listen(this.config.port);
 
     if (this.config.searchIgnore) {
       this.parseOptionalIgnoredProps();
@@ -253,6 +249,7 @@ class GreenTomato {
   }
 
   constructor() {
+
     this.config = {
       running: false,
       dataBase: "mongodb://localhost:27017/green-tomato"
