@@ -26,7 +26,8 @@ class GreenTomato {
     var responseData = entry ? entry.responseData : {};
     const type = typeof responseData;
     response.statusCode = entry ? entry.responseStatusCode || 200 : 200;
-    response.string = JSON.stringify(responseData);
+    response.string = JSON.stringify(responseData.body);
+    response.headers = responseData.headers;
     response.headers["content-type"] = `${(type === "object" ? "application/json" : "text/html;")} ; charset=UTF-8`;
   }
 
@@ -42,7 +43,7 @@ class GreenTomato {
             method: request.method,
             headers: __.sortObjectDeep(this.formatHeaders(request.headers), true),
             body: __.sortObjectDeep(request.json, true),
-            responseData: response.json,
+            responseData: {body: response.json, headers: this.formatHeaders(response.headers)},
             responseStatusCode: response.statusCode
           })).save((error) => {
             if (error) return console.error(error);
